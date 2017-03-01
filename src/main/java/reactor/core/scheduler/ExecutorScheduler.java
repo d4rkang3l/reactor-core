@@ -32,6 +32,8 @@ import reactor.util.concurrent.OpenHashSet;
  * <p>
  * It supports both non-trampolined worker (for cases where the trampolining happens
  * externally) and trampolined worker.
+ *
+ * @author Stephane Maldini
  */
 final class ExecutorScheduler implements Scheduler {
 

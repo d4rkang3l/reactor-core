@@ -31,8 +31,10 @@ import reactor.core.Disposable;
  * passed through the relevant {@link Schedulers} hook
  * ({@link Schedulers#decorateExecutorService(String, Supplier)} or
  * {@link Schedulers#decorateScheduledExecutorService(String, Supplier)}).
+ *
+ * @author Stephane Maldini
+ * @author Simon Baslé
  */
-//@FunctionalInterface
 public interface Scheduler extends Disposable {
 	/**
 	 * Schedules the given task on this scheduler non-delayed execution.
@@ -46,11 +48,6 @@ public interface Scheduler extends Disposable {
 	 * @return the {@link Cancellation} instance that let's one cancel this particular task.
 	 * If the {@link Scheduler} has been shut down, the {@link #REJECTED} {@link Cancellation} instance is returned.
 	 */
-//	default Cancellation schedule(Runnable task) {
-//		//TODO re-evaluate default implementation
-//		task.run();
-//		return ImmediateScheduler.EMPTY;
-//	}
 	Cancellation schedule(Runnable task);
 
 	/**
@@ -69,7 +66,6 @@ public interface Scheduler extends Disposable {
 	default Cancellation schedule(Runnable task, long delay, TimeUnit unit) {
 		return NOT_TIMED;
 	}
-//	Cancellation schedule(Runnable task, long delay, TimeUnit unit);
 
 	/**
 	 * Schedules a periodic execution of the given task with the given initial delay and period.
@@ -92,7 +88,6 @@ public interface Scheduler extends Disposable {
 	default Cancellation schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit) {
 		return NOT_TIMED;
 	}
-//	Cancellation schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit);
 
 	/**
 	 * Returns the "current time" notion of this scheduler.
@@ -162,7 +157,10 @@ public interface Scheduler extends Disposable {
 
 	/**
 	 * A worker representing an asynchronous boundary that executes tasks in
-	 * a FIFO order, guaranteed non-concurrently with respect to each other. 
+	 * a FIFO order, guaranteed non-concurrently with respect to each other.
+	 *
+	 * @author Stephane Maldini
+	 * @author Simon Baslé
 	 */
 	interface Worker extends Disposable {
 		

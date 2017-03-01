@@ -22,7 +22,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import reactor.core.Disposable;
 import reactor.core.DisposableContainer;
@@ -31,6 +30,9 @@ import reactor.util.concurrent.OpenHashSet;
 /**
  * A simple {@link Scheduler} which uses a backing {@link ExecutorService} to schedule
  * Runnables for async operators.
+ *
+ * @author Stephane Maldini
+ * @author Simon Baslé
  */
 final class ExecutorServiceScheduler implements Scheduler {
 

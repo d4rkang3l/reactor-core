@@ -31,6 +31,8 @@ import reactor.util.concurrent.OpenHashSet;
 /**
  * Scheduler that hosts a fixed pool of single-threaded ExecutorService-based workers
  * and is suited for parallel work.
+ *
+ * @author Stephane Maldini
  */
 final class ParallelScheduler implements Scheduler, Supplier<ExecutorService> {
 

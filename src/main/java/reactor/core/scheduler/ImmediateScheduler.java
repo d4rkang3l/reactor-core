@@ -21,6 +21,8 @@ import reactor.core.Disposable;
  * Executes tasks on the caller's thread immediately.
  * <p>
  * Use the ImmediateScheduler.instance() to get a shared, stateless instance of this scheduler.
+ *
+ * @author Stephane Maldini
  */
 final class ImmediateScheduler implements Scheduler {
 
