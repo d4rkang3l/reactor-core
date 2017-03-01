@@ -15,31 +15,26 @@
  */
 package reactor.core.scheduler;
 
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Stephane Maldini
+ * @author Simon Baslé
  */
 public class ElasticSchedulerTest extends AbstractSchedulerTest {
 
 	@Override
 	protected Scheduler scheduler() {
 		return Schedulers.elastic();
-	}
-
-	@Override
-	protected boolean shouldTestDirectScheduleDelayPeriod() {
-		//TODO remove when elastic is time-capable
-		return false;
-	}
-
-	@Override
-	protected boolean shouldTestWorkerScheduleDelayPeriod() {
-		//TODO remove when elastic is time-capable
-		return false;
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -86,5 +81,61 @@ public class ElasticSchedulerTest extends AbstractSchedulerTest {
 
 		assertThat(((ElasticScheduler)s).cache).isEmpty();
 		assertThat(s.isDisposed()).isTrue();
+	}
+
+	@Test
+	public void scheduledDoesntReject() {
+		Scheduler s = scheduler();
+
+		assertThat(s.schedule(() -> {}, 100, TimeUnit.MILLISECONDS))
+				.describedAs("direct delayed scheduling")
+				.isNotInstanceOf(RejectedDisposable.class);
+		assertThat(s.schedulePeriodically(() -> {}, 100, 100, TimeUnit.MILLISECONDS))
+				.describedAs("direct periodic scheduling")
+				.isNotInstanceOf(RejectedDisposable.class);
+
+		Scheduler.Worker w = s.createWorker();
+		assertThat(w.schedule(() -> {}, 100, TimeUnit.MILLISECONDS))
+				.describedAs("worker delayed scheduling")
+				.isNotInstanceOf(RejectedDisposable.class);
+		assertThat(w.schedulePeriodically(() -> {}, 100, 100, TimeUnit.MILLISECONDS))
+				.describedAs("worker periodic scheduling")
+				.isNotInstanceOf(RejectedDisposable.class);
+	}
+
+	@Test
+	public void smokeTestDelay() {
+		Scheduler s = scheduler();
+
+		try {
+			StepVerifier.create(Mono.delay(Duration.ofMillis(10), scheduler()))
+			            .expectSubscription()
+			            .expectNoEvent(Duration.ofMillis(10))
+			            .expectNext(0L)
+			            .verifyComplete();
+		}
+		finally {
+			s.dispose();
+		}
+	}
+
+	@Test
+	public void smokeTestInterval() {
+		Scheduler s = scheduler();
+
+		try {
+			StepVerifier.create(Flux.interval(Duration.ofMillis(5), Duration.ofMillis(10), scheduler()))
+			            .expectSubscription()
+			            .expectNoEvent(Duration.ofMillis(5))
+			            .expectNext(0L)
+			            .expectNoEvent(Duration.ofMillis(10))
+			            .expectNext(1L)
+			            .expectNoEvent(Duration.ofMillis(10))
+			            .expectNext(2L)
+			            .thenCancel();
+		}
+		finally {
+			s.dispose();
+		}
 	}
 }
